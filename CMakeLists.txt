@@ -286,10 +286,18 @@ else(ROS_EDITION STREQUAL "ROS2")
     rosidl_get_typesupport_target(cpp_typesupport_target
     ${LIVOX_INTERFACES} "rosidl_typesupport_cpp")
     target_link_libraries(${PROJECT_NAME} "${cpp_typesupport_target}")
+    # For Humble, get the include directories from the typesupport target
+    get_target_property(LIVOX_INTERFACES_INCLUDE_DIRECTORIES ${cpp_typesupport_target} INTERFACE_INCLUDE_DIRECTORIES)
   else()
     set(LIVOX_INTERFACE_TARGET "${LIVOX_INTERFACES}__rosidl_typesupport_cpp")
     add_dependencies(${PROJECT_NAME} ${LIVOX_INTERFACES})
     get_target_property(LIVOX_INTERFACES_INCLUDE_DIRECTORIES ${LIVOX_INTERFACE_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
+  endif()
+  
+  # Handle case where the property might not be set
+  if(NOT LIVOX_INTERFACES_INCLUDE_DIRECTORIES)
+    message(WARNING "LIVOX_INTERFACES_INCLUDE_DIRECTORIES not found, using fallback")
+    set(LIVOX_INTERFACES_INCLUDE_DIRECTORIES "")
   endif()
 
   # include file direcotry
